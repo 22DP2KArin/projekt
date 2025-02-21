@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="lv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OZYM - Veikali</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <button class="dark-mode-toggle">🌙</button>
+
+    <h1>OZYM - Veikali</h1>
+    <div class="store-container">
+        <div class="store-card" onclick="openStore('maxima')">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Maxima_logo.svg/2560px-Maxima_logo.svg.png" alt="Maxima" class="store-icon">
+            <h2>Maxima</h2>
+        </div>
+        <div class="store-card" onclick="openStore('rimi')">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHUMSuH8UAXM2TCoU7B3ztHmHP9AeJEsTVFQ&s" alt="Rimi" class="store-icon">
+            <h2>Rimi</h2>
+        </div>
+        <div class="store-card" onclick="openStore('lidl')">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Lidl_logo.png/480px-Lidl_logo.png" alt="Lidl" class="store-icon">
+            <h2>Lidl</h2>
+        </div>
+        <div class="store-card" onclick="openStore('mego')">
+            <img src="https://mego.lv/assets/logos/mego-0ae0e98201f632e8bede7d70fd67a021ad3025c5a92f5bf7574750eac039406c.png" alt="Mego" class="store-icon">
+            <h2>Mego</h2>
+        </div>
+        
+    </div>
+    
+
+    <div id="store-content" class="hidden">
+        <button class="back-btn" onclick="goBack()">⬅ Atpakaļ</button>
+        <h2 id="store-name"></h2>
+        <input type="text" class="search-bar" placeholder="Meklēt..." oninput="searchProducts(this.value)">
+        <div id="products"></div>
+        <button class="cart-btn" onclick="toggleCart()">🛒 Atvērt grozu</button>
+    </div>
+
+    <div id="cart-section" class="hidden">
+        <h2>Jūsu grozs</h2>
+        <div id="cart-items"></div>
+        <button class="checkout-btn" onclick="openCheckout()">Apmaksāt</button>
+        <button class="close-cart" onclick="toggleCart()">Aizvērt</button>
+    </div>
+
+    <div id="checkout-modal" class="modal-overlay">
+        <div class="modal">
+            <h2>Pasūtījuma informācija</h2>
+            <input type="text" id="name" placeholder="Vārds">
+            <input type="email" id="email" placeholder="E-pasts">
+            <input type="tel" id="phone" placeholder="Telefona numurs">
+            <input type="text" id="address" placeholder="Adrese">
+            <button class="confirm-btn" onclick="confirmOrder()">Apstiprināt</button>
+            <button class="close-checkout" onclick="closeCheckout()">Aizvērt</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
