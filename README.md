@@ -1,9 +1,9 @@
 //DATUBAZE 
--- Создание базы данных
+
 CREATE DATABASE IF NOT EXISTS projekt CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 USE projekt;
 
--- Таблица администраторов
+
 CREATE TABLE admins (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE admins (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Таблица пользователей
+
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL,
@@ -21,7 +21,6 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Таблица корзины
 CREATE TABLE cart (
     id INT AUTO_INCREMENT PRIMARY KEY,
     session_id VARCHAR(255) NOT NULL,
@@ -31,7 +30,7 @@ CREATE TABLE cart (
     added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Таблица заказов
+
 CREATE TABLE orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
@@ -41,7 +40,6 @@ CREATE TABLE orders (
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
--- Таблица товаров в заказе
 CREATE TABLE order_items (
     id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT NOT NULL,
@@ -51,7 +49,7 @@ CREATE TABLE order_items (
     FOREIGN KEY (order_id) REFERENCES orders(id)
 );
 
--- Таблица продуктов
+
 CREATE TABLE products (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -60,7 +58,6 @@ CREATE TABLE products (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Таблица цен продуктов по магазинам
 CREATE TABLE product_prices (
     id INT AUTO_INCREMENT PRIMARY KEY,
     product_id INT NOT NULL,
