@@ -1,137 +1,173 @@
-let cart = {};
-let currentStore = '';
+let cart = [];
+let currentStore = null;
 
-const productsData = {
-    maxima: [
-        { name: "Piens", price: 1.2 },
-        { name: "Maize", price: 0.8 },
-        { name: "Siers", price: 2.5 },
-        { name: "Olas", price: 1.5 },
-        { name: "Sviests", price: 3.0 }
-    ],
-    rimi: [
-        { name: "Kafija", price: 4.2 },
-        { name: "Tēja", price: 2.5 },
-        { name: "Cukurs", price: 1.1 },
-        { name: "Šokolāde", price: 2.8 },
-        { name: "Banāni", price: 1.9 }
-    ],
-    lidl: [
-        { name: "Sula", price: 3.0 },
-        { name: "Ūdens", price: 0.6 },
-        { name: "Čipsi", price: 2.0 },
-        { name: "Jogurts", price: 1.4 },
-        { name: "Medus", price: 5.0 }
-    ],
-    mego: [
-        { name: "Kviešu milti", price: 1.3 },
-        { name: "Griķi", price: 2.0 },
-        { name: "Rīsi", price: 2.2 },
-        { name: "Tomāti", price: 3.5 },
-        { name: "Gurķi", price: 2.7 }
-    ]
-};
+function showTab(tabId) {
+  const allSections = ["searchTab", "cart", "register", "productList", "productDetails", "storeCards"];
+  allSections.forEach(id => {
+    const section = document.getElementById(id);
+    if (section) section.classList.add("hidden");
+  });
 
-function openStore(storeName) {
-    currentStore = storeName;
-    document.querySelector(".store-container").classList.add("hidden");
-    document.getElementById("store-content").classList.remove("hidden");
-    document.getElementById("store-name").innerText = storeName.charAt(0).toUpperCase() + storeName.slice(1);
-    loadProducts(storeName);
+  const activeSection = document.getElementById(tabId);
+  if (activeSection) activeSection.classList.remove("hidden");
+
+  // Если открыли поиск, покажем магазины
+  if (tabId === "searchTab" || tabId === "productList") {
+    const storeCards = document.getElementById("storeCards");
+    if (storeCards) storeCards.classList.remove("hidden");
+  }
 }
 
-function loadProducts(store) {
-    let productsDiv = document.getElementById("products");
-    productsDiv.innerHTML = "";
-    productsData[store].forEach(product => {
-        productsDiv.innerHTML += `
-            <div class="product-card">
-                <h3>${product.name}</h3>
-                <p>${product.price}€</p>
-                <button class="add-btn" onclick="addToCart('${store}', '${product.name}', ${product.price})">Pievienot grozam</button>
-            </div>
-        `;
-    });
+function viewStore(storeName) {
+  currentStore = storeName;
+  const list = document.getElementById("productList");
+  const details = document.getElementById("productDetails");
+  list.innerHTML = "";
+  details.classList.add("hidden");
+  list.classList.remove("hidden");
+
+  stores[storeName].forEach(product => {
+    const div = document.createElement("div");
+    div.className = "product";
+    div.innerHTML = `
+      <img src="${product.image}" alt="${product.name}" />
+      <h3>${product.name}</h3>
+      <p>${product.description}</p>
+      <p><b>${product.price.toFixed(2)}€</b></p>
+      <button onclick="addToCart('${product.name}', ${product.price})">Pievienot grozam</button>
+      <button onclick="showDetails('${product.name}')">Skatīt</button>
+    `;
+    list.appendChild(div);
+  });
 }
 
-function searchProducts(query) {
-    let productsDiv = document.getElementById("products");
-    productsDiv.innerHTML = "";
-    productsData[currentStore].filter(product => 
-        product.name.toLowerCase().includes(query.toLowerCase())
-    ).forEach(product => {
-        productsDiv.innerHTML += `
-            <div class="product-card">
-                <h3>${product.name}</h3>
-                <p>${product.price}€</p>
-                <button class="add-btn" onclick="addToCart('${currentStore}', '${product.name}', ${product.price})">Pievienot grozam</button>
-            </div>
-        `;
-    });
+function addToCart(name, price) {
+  cart.push({ name, price });
+  document.getElementById("cartCount").textContent = cart.length;
 }
 
-function goBack() {
-    document.getElementById("store-content").classList.add("hidden");
-    document.querySelector(".store-container").classList.remove("hidden");
-}
-
-function addToCart(store, name, price) {
-    if (!cart[store]) cart[store] = [];
-    cart[store].push({ name, price });
-    updateCart();
-}
-
-function updateCart() {
-    let cartItems = document.getElementById("cart-items");
-    cartItems.innerHTML = "";
-    for (let store in cart) {
-        if (cart[store].length > 0) {
-            cartItems.innerHTML += `<h3>${store.toUpperCase()}</h3>`;
-            cart[store].forEach((item, index) => {
-                cartItems.innerHTML += `
-                    <li>${item.name} - ${item.price}€ 
-                        <button class="remove-btn" onclick="removeFromCart('${store}', ${index})">X</button>
-                    </li>
-                `;
-            });
-        }
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.querySelector('input[name="search"]');
+    if (searchInput) {
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                searchInput.form.submit();
+            }
+        });
     }
-}
-
-function removeFromCart(store, index) {
-    cart[store].splice(index, 1);
-    updateCart();
-}
+});
 
 function toggleCart() {
-    document.getElementById("cart-section").classList.toggle("hidden");
+  const cartSection = document.getElementById("cart");
+  cartSection.classList.toggle("hidden");
+  const list = document.getElementById("cartItems");
+  list.innerHTML = "";
+  cart.forEach(item => {
+    const li = document.createElement("li");
+    li.textContent = `${item.name} - ${item.price.toFixed(2)}€`;
+    list.appendChild(li);
+  });
 }
 
-function openCheckout() {
-    document.getElementById("checkout-modal").style.display = "flex";
+function checkout() {
+  if (cart.length === 0) return alert("Grozs ir tukšs!");
+
+  fetch("https://api.stripe.com/v1/checkout/sessions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "Authorization": "Bearer sk_test_1234567890abcdef" // 🔒 замените на свою Stripe API key
+    },
+    body: new URLSearchParams({
+      "success_url": window.location.href,
+      "cancel_url": window.location.href,
+      "line_items[0][price_data][currency]": "eur",
+      "line_items[0][price_data][product_data][name]": cart[0].name,
+      "line_items[0][price_data][unit_amount]": Math.round(cart[0].price * 100),
+      "line_items[0][quantity]": "1",
+      "mode": "payment"
+    })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.url) window.location = data.url;
+      else alert("Stripe kļūda");
+    });
 }
 
-function closeCheckout() {
-    document.getElementById("checkout-modal").style.display = "none";
-}
-
-function confirmOrder() {
-    let name = document.getElementById("name").value;
-    let email = document.getElementById("email").value;
-    let phone = document.getElementById("phone").value;
-    let address = document.getElementById("address").value;
-
-    if (!name || !email || !phone || !address) {
-        alert("Aizpildiet visus laukus!");
-        return;
+function searchProducts() {
+  const query = document.getElementById("searchInput").value.toLowerCase();
+  if (!query) return;
+  for (const store in stores) {
+    const product = stores[store].find(p => p.name.toLowerCase().includes(query));
+    if (product) {
+      viewStore(store);
+      return;
     }
-
-    alert(`Paldies, ${name}! Jūsu pasūtījums ir pieņemts.`);
-    cart = {};
-    updateCart();
-    closeCheckout();
+  }
+  alert("Produkts nav atrasts.");
 }
 
-document.querySelector(".dark-mode-toggle").addEventListener("click", () => {
-    document.body.classList.toggle("dark-mode");
+function showDetails(productName) {
+  const section = document.getElementById("productDetails");
+  section.innerHTML = `<h2>${productName} cenas dažādos veikalos</h2>`;
+  for (const store in stores) {
+    const match = stores[store].find(p => p.name === productName);
+    if (match) {
+      const div = document.createElement("div");
+      div.className = "product";
+      div.innerHTML = `
+        <img src="${match.image}" />
+        <h3>${store}</h3>
+        <p>${match.description}</p>
+        <p><b>${match.price.toFixed(2)}€</b></p>
+        <button onclick="addToCart('${match.name}', ${match.price})">Pievienot grozam</button>
+      `;
+      section.appendChild(div);
+    }
+  }
+  section.classList.remove("hidden");
+}
+
+function toggleRegister() {
+  document.getElementById("register").classList.toggle("hidden");
+}
+
+function registerUser() {
+  const name = document.getElementById("regName").value;
+  const email = document.getElementById("regEmail").value;
+  const pass = document.getElementById("regPass").value;
+  if (!name || !email || !pass) return alert("Aizpildiet visus laukus");
+  localStorage.setItem("ozymUser", JSON.stringify({ name, email, pass }));
+  alert("Reģistrācija veiksmīga!");
+  toggleRegister();
+}
+function updateCart() {
+
+  let total = 0;
+  cart.forEach(item => {
+    total += item.price * item.quantity;
+  });
+
+  const totalPriceElement = document.getElementById("total-price");
+  if (totalPriceElement) {
+    totalPriceElement.textContent = `${total}₽`;
+  }
+}
+document.getElementById("register-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
+
+  const response = await fetch("/register", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ username, password }),
+  });
+
+  const result = await response.json();
+  document.getElementById("register-status").textContent = result.message;
 });

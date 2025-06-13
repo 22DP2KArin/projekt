@@ -56,3 +56,39 @@ createApp({
         }
     }
 }).mount("#app");
+const express = require("express");
+const app = express();
+const sqlite3 = require("sqlite3").verbose();
+const bcrypt = require("bcrypt");
+const path = require("path");
+
+const db = new sqlite3.Database("./users.db");
+
+app.use(express.static("."));
+app.use(express.json());
+
+// Создание таблицы пользователей
+db.run(`CREATE TABLE IF NOT EXISTS users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  username TEXT UNIQUE,
+  password TEXT
+)`);
+
+// Регистрация
+app.post("/register", async (req, res) => {
+  const { username, password } = req.body;
+  const hash = await bcrypt.hash(password, 10);
+
+  db.run(`INSERT INTO users (username, password) VALUES (?, ?)`, [username, hash], function(err) {
+    if (err) {
+      return res.json({ message: "Пользователь уже существует" });
+    }
+    res.json({ message: "Регистрация успешна!" });
+  });
+});
+
+// Запуск сервера
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Сервер запущен: http://localhost:${PORT}`);
+});
